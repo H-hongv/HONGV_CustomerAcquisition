@@ -77,8 +77,7 @@ A: 在"权重调整"页面拖动滑块。
 <img width="1195" height="831" alt="2" src="https://github.com/user-attachments/assets/4a5706d5-6ef6-4de7-9d7d-ff277d6a82c4" />
 主要接入的mcp适配免费收费双模式
 
-<img width="1920" height="976" alt="3" src="https://github.com/user-attachments/assets/fa743e33-e422-433e-a8c2-0d8af363305c" />
-用配置好的某行业筛选配置筛选得到的潜在客户示例，下一步就能通过gmail批量开发功能导入csv实现个性化自定义开发信询盘。
+用配置好的某行业筛选配置筛选得到的潜在客户csv，下一步就能通过gmail批量开发功能导入csv实现个性化自定义开发信询盘。
 
 ## 技术支持
 
