@@ -1,16 +1,17 @@
-#外贸获客自动化系统
+# 龙砺获客自动化系统
 
 ## 简介
-外贸获客自动化系统是一个基于AI的智能获客工具，用于自动搜索、分析和筛各种行业的潜在客户。
+
+龙砺获客自动化系统是一个基于AI的智能获客工具，用于自动搜索、分析和筛选金属铸造行业的潜在客户。
 
 ## 功能特点
 
 - **双模式运行**：免费模式（DuckDuckGo + trafilatura）和收费模式（Tavily + Firecrawl）
-- **多LLM支持**：OpenAI、Gemini、deepseek、Ollama本地模型
+- **多LLM支持**：OpenAI、Gemini、Ollama本地模型
 - **智能分析**：自动评分、等级划分、否决条件
 - **Web界面**：Streamlit UI，可视化配置和执行
 
-## 评分体系（按需修改）
+## 评分体系（总分135分）
 
 | 维度 | 分数 | 说明 |
 |------|------|------|
@@ -18,7 +19,7 @@
 | 工艺需求 | 25分 | 需要打磨/抛光/去毛刺工艺 |
 | **意图信号** | **40分** | 核心维度，权重最高 |
 | 规模匹配度 | 20分 | 是否有采购能力 |
-| 环保加分 | 10分 | 企业环保要求 |
+| 环保加分 | 10分 | 欧洲企业环保要求 |
 | 信息完整度 | 5分 | 联系方式完整度 |
 | 转化潜力 | 15分 | 综合转化可能性 |
 
@@ -46,7 +47,48 @@ python main.py
 
 浏览器自动打开 http://localhost:8501
 
+## 目录结构
 
+```
+获客自动化/
+├── main.py                    # PyQt5 主入口
+├── config.py                   # 配置管理
+├── models.py                   # 数据模型
+├── pipeline.py                 # 流程编排
+├── csv_manager.py              # CSV管理
+├── logger.py                   # 日志
+├── start.py                    # 快速启动脚本
+├── 启动.bat                   # Windows 双击启动
+├── .env.example                # 环境变量模板
+├── requirements.txt            # 依赖包
+│
+├── providers/
+│   ├── search/                 # 搜索模块
+│   │   ├── base.py
+│   │   ├── ddg_provider.py     # 免费
+│   │   ├── tavily_provider.py  # 收费
+│   │   └── factory.py
+│   │
+│   ├── crawl/                  # 爬取模块
+│   │   ├── base.py
+│   │   ├── trafilatura_provider.py  # 免费
+│   │   ├── firecrawl_provider.py    # 收费
+│   │   └── factory.py
+│   │
+│   ├── verify/                 # 验证模块
+│   │   ├── base.py
+│   │   ├── dns_provider.py     # 免费
+│   │   └── factory.py
+│   │
+│   └── llm/                    # LLM模块
+│       ├── base.py
+│       ├── openai_provider.py
+│       ├── gemini_provider.py
+│       ├── ollama_provider.py
+│       └── factory.py
+│
+└── templates/                  # Prompt模板
+```
 
 ## 使用方式
 
@@ -68,7 +110,7 @@ python main.py --mode paid --country 德国 --count 20
 
 ## 评分规则
 
-### 意图信号（按需修改）
+### 意图信号（40分）
 
 **强信号（30-40分）**
 - 招聘打磨/抛光/去毛刺工人：40分
@@ -122,6 +164,12 @@ A: 在"提示词管理"页面编辑。
 
 A: 在"权重调整"页面拖动滑块。
 
+### Q: Ollama如何使用？
+
+A: 
+1. 安装Ollama：https://ollama.ai
+2. 下载模型：`ollama pull qwen2.5:7b`
+3. 在配置中选择 `ollama`
 
 ## 技术支持
 
@@ -129,5 +177,5 @@ A: 在"权重调整"页面拖动滑块。
 
 ---
 
-*版本：v1.0*
+*版本：v3.0*
 *更新日期：2026-07-09*

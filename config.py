@@ -1,4 +1,4 @@
-"""
+﻿"""
 获客自动化系统 - 通用配置管理
 
 通用化设计:
@@ -301,7 +301,7 @@ class IndustryManager:
             result[key] = {"name": tmpl["name"], "builtin": True}
         for f in INDUSTRIES_DIR.glob("*.json"):
             try:
-                data = json.loads(f.read_text(encoding="utf-8"))
+                data = json.loads(f.read_text(encoding="utf-8-sig"))
                 result[f.stem] = {"name": data.get("name", f.stem), "builtin": False}
             except Exception:
                 pass
@@ -317,7 +317,7 @@ class IndustryManager:
             return tmpl
         f = INDUSTRIES_DIR / f"{key}.json"
         if f.exists():
-            data = json.loads(f.read_text(encoding="utf-8"))
+            data = json.loads(f.read_text(encoding="utf-8-sig"))
             errors = self.validate_template(data, str(f))
             if errors:
                 from logger import logger
@@ -327,7 +327,7 @@ class IndustryManager:
 
     def save_industry(self, key, data):
         f = INDUSTRIES_DIR / f"{key}.json"
-        f.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        f.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8-sig")
 
     def delete_industry(self, key):
         f = INDUSTRIES_DIR / f"{key}.json"
@@ -346,7 +346,7 @@ class Config:
     def _load(self):
         if SETTINGS_FILE.exists():
             try:
-                with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+                with open(SETTINGS_FILE, "r", encoding="utf-8-sig") as f:
                     saved = json.load(f)
                 self._deep_update(self.settings, saved)
             except Exception as e:
@@ -354,7 +354,7 @@ class Config:
 
     def save(self):
         try:
-            with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
+            with open(SETTINGS_FILE, "w", encoding="utf-8-sig") as f:
                 json.dump(self.settings, f, ensure_ascii=False, indent=2)
             return True
         except Exception as e:
