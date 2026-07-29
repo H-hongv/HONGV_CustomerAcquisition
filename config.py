@@ -72,7 +72,7 @@ DEFAULT_SETTINGS = {
     },
 
     "company_info": {
-        "name": "龙砺智能科技",
+        "name": "您的公司名称",
         "product": "打磨抛光机器人工作站",
         "industry_expert": "金属铸造",
         "advantages": ["高精度打磨", "自动化抛光", "智能去毛刺", "环保低噪音"]

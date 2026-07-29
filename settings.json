@@ -42,16 +42,16 @@
     "email": "你是{company_name}的销售专家。根据以下客户背调报告, 撰写一封专业的开发信。\n\n客户信息:\n{customer_report}\n\n我方产品信息:\n{product_details}\n\n核心优势: {advantages}\n\n要求:\n1. 针对客户的具体痛点和需求, 结合我方产品线中与其压铸机吨位匹配的方案\n2. 突出核心优势, 用具体数据和技术细节增加说服力\n3. 语言专业、简洁、有说服力 (200-250词)\n4. 包含明确的行动号召 (建议回复时间/会议安排)\n5. 根据客户所在国家的语言撰写 (德语/法语/日语/英语/西班牙语/意大利语/土耳其语等)\n6. 邮件标题要专业且能吸引注意\n\n请生成:\n1. 邮件主题 (subject)\n2. 邮件正文 (body)"
   },
   "company_info": {
-    "name": "龙砺智能科技",
-    "product": "压铸件自动磨抛机器人工作站",
-    "industry_expert": "铝铸件自动磨抛",
+    "name": "您的公司名称",
+    "product": "工业自动化设备",
+    "industry_expert": "工业自动化",
     "advantages": [
-      "减少人工成本",
+      "降低人工成本",
       "提高产品标准化程度",
       "减少环境污染",
       "提高生产自动化程度"
     ],
-    "product_details": "产品线覆盖400T-12000T压铸机配套磨抛方案: LRMC-400T(300x300mm以下), LRMC-800T(500x400mm以下), LRMC-2000T(大型件), LRMC-5000T(600x600mm), LRMC-12000T(1200x600mm超大件)。 核心配置: FANUC机器人(12-70kg负载), 3D视觉定位, 2D瑕疵检测, 湿式除尘系统, 力控打磨, 快换刀架。 另有六轴数控去毛刺工作站LRMC-870, 自动喷涂机LRPT-A1, 砂带机系列。 已服务全国20个分公司, 浙江省专精特新企业。"
+    "product_details": "产品线覆盖多种规格的工业自动化解决方案，包括标准型、中型、大型和超大型设备。核心配置采用国际品牌机器人，配备智能视觉定位、缺陷检测、除尘系统等。"
   },
   "search": {
     "max_results_per_query": 10,
@@ -96,7 +96,7 @@
   "gmail": {
     "email": "",
     "app_password": "",
-    "sender_name": "Hangzhou Longli Intelligent Technology",
+    "sender_name": "Your Company Name",
     "daily_limit": 50,
     "delay_seconds": 30
   },
