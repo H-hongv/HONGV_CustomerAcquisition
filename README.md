@@ -1,13 +1,12 @@
-# 龙砺获客自动化系统
+#外贸获客自动化系统
 
 ## 简介
-
-龙砺获客自动化系统是一个基于AI的智能获客工具，用于自动搜索、分析和筛选金属铸造行业的潜在客户。
+外贸获客自动化系统是一个基于AI的智能获客工具，用于自动搜索、分析和筛各种行业的潜在客户。
 
 ## 功能特点
 
 - **双模式运行**：免费模式（DuckDuckGo + trafilatura）和收费模式（Tavily + Firecrawl）
-- **多LLM支持**：OpenAI、Gemini、Ollama本地模型
+- **多LLM支持**：OpenAI、Gemini、deepseek、Ollama本地模型
 - **智能分析**：自动评分、等级划分、否决条件
 - **Web界面**：Streamlit UI，可视化配置和执行
 
