@@ -1,0 +1,20 @@
+{
+  "tasks": [
+    {
+      "name": "daily_germany_automotive",
+      "country": "Germany",
+      "industry": "automotive",
+      "product": "die casting",
+      "count": 50,
+      "mode": "free",
+      "cron": "0 8 * * *",
+      "enabled": true
+    }
+  ],
+  "settings": {
+    "max_daily_cost_usd": 5.0,
+    "pause_on_error": true,
+    "error_cooldown_minutes": 30,
+    "health_check_interval_seconds": 60
+  }
+}

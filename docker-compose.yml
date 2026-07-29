@@ -1,0 +1,37 @@
+﻿version: "3.9"
+
+services:
+  sdr-agent:
+    build: .
+    container_name: sdr-agent
+    restart: unless-stopped
+    volumes:
+      - ./memory:/app/memory
+      - ./exports:/app/exports
+      - ./logs:/app/logs
+      - ./.env:/app/.env:ro
+      - ./industries:/app/industries:ro
+    environment:
+      - TZ=Asia/Shanghai
+    # CLI mode example:
+    # command: ["--country", "Germany", "--industry", "automotive", "--engine", "graph"]
+    # Daemon mode:
+    command: ["--daemon"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "from workflow import checkpointer; checkpointer.get_analytics()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: future PostgreSQL
+  # postgres:
+  #   image: postgres:15
+  #   environment:
+  #     POSTGRES_DB: sdr_agent
+  #     POSTGRES_USER: sdr
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+
+# volumes:
+#   pgdata:

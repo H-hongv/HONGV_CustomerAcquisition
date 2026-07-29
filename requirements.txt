@@ -1,0 +1,32 @@
+﻿# Customer Acquisition System - Dependencies
+
+# Core
+python-dotenv>=1.0.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# Search
+ddgs>=6.0.0
+tavily-python>=0.3.0
+
+# Crawl
+trafilatura>=1.6.0
+firecrawl-py>=0.0.5
+google-search-results>=2.4.0
+apify-client>=2.0.0
+
+# Verify
+dnspython>=2.4.0
+
+# LLM (OpenAI compatible)
+openai>=1.0.0
+google-generativeai>=0.3.0
+
+# GUI
+PyQt5>=5.15.0
+
+# Build
+pyinstaller>=6.0.0
+
+

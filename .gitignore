@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+logs/
+exports/
+*.log
+*.db
+*.sqlite
+memory/*.db
+
+# Temp/debug
+_*.txt
+_*.py
+
+# MCP/CodeGraph
+.codegraph/
+.mcp/
+.pytest_cache/
+spec/v80_*
+spec/state.json
+spec/workflow.json
+spec/review_*
+spec/audit_*
+bench_results.json

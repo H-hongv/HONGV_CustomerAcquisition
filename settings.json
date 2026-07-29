@@ -1,0 +1,104 @@
+﻿{
+  "mode": "free",
+  "active_industry": "__builtin_metal_casting__",
+  "llm": {
+    "provider": "deepseek",
+    "providers": {
+      "deepseek": {
+        "name": "DeepSeek",
+        "api_key": "",
+        "base_url": "https://api.deepseek.com/v1",
+        "model": "deepseek-v4-flash",
+        "temperature": 0.3,
+        "max_tokens": 4000,
+        "response_format": "json"
+      },
+      "mimo": {
+        "name": "Mimo AI",
+        "api_key": "",
+        "base_url": "https://api.mimo.ai/v1",
+        "model": "mimo-latest",
+        "temperature": 0.3,
+        "max_tokens": 2000,
+        "response_format": "json"
+      }
+    }
+  },
+  "api_keys": {
+    "tavily": "",
+    "firecrawl": "",
+    "serpapi": "",
+    "apify": "",
+    "hunterio": "",
+    "groq": "",
+    "google_cse": "",
+    "google_cse_id": "",
+    "zerobounce": "",
+    "prospector": ""
+  },
+  "mcp_clients": [],
+  "prompts": {
+    "analyze": "你是一个行业专家, 专门为{company_name}寻找{target_product}的潜在客户。\n\n根据以下企业信息, 判断是否为潜在客户:\n\n{company_info}\n\n请分析以下维度:\n{dimensions_desc}\n\n请返回JSON格式:\n{json_format}\n\n重要规则:\n1. 从企业信息中尽可能提取完整字段: product/process/material/application/scale/contact_name/phone\n2. 对于意图信号(intent_signal), 区分隐性信号(招聘扩张/融资/展会参展/认证升级/设备采购)和显性信号\n3. 验证信号的具体性 - 有具体数字/时间/金额的信号更可靠\n4. 检查信号来源 - 官网/招聘页/新闻稿比论坛更可靠\n5. 企业信息可能是任何语言(德/法/日/西/葡/意/土/波兰/瑞典等), 请用多语言理解能力分析, 中文回复\n6. 评分要严格 - 如果信息不足, 宁可评分低也不要虚高\n7. 对于scale字段, 尽量给出具体数字(员工数/产能/面积等)",
+    "email": "你是{company_name}的销售专家。根据以下客户背调报告, 撰写一封专业的开发信。\n\n客户信息:\n{customer_report}\n\n我方产品信息:\n{product_details}\n\n核心优势: {advantages}\n\n要求:\n1. 针对客户的具体痛点和需求, 结合我方产品线中与其压铸机吨位匹配的方案\n2. 突出核心优势, 用具体数据和技术细节增加说服力\n3. 语言专业、简洁、有说服力 (200-250词)\n4. 包含明确的行动号召 (建议回复时间/会议安排)\n5. 根据客户所在国家的语言撰写 (德语/法语/日语/英语/西班牙语/意大利语/土耳其语等)\n6. 邮件标题要专业且能吸引注意\n\n请生成:\n1. 邮件主题 (subject)\n2. 邮件正文 (body)"
+  },
+  "company_info": {
+    "name": "龙砺智能科技",
+    "product": "压铸件自动磨抛机器人工作站",
+    "industry_expert": "铝铸件自动磨抛",
+    "advantages": [
+      "减少人工成本",
+      "提高产品标准化程度",
+      "减少环境污染",
+      "提高生产自动化程度"
+    ],
+    "product_details": "产品线覆盖400T-12000T压铸机配套磨抛方案: LRMC-400T(300x300mm以下), LRMC-800T(500x400mm以下), LRMC-2000T(大型件), LRMC-5000T(600x600mm), LRMC-12000T(1200x600mm超大件)。 核心配置: FANUC机器人(12-70kg负载), 3D视觉定位, 2D瑕疵检测, 湿式除尘系统, 力控打磨, 快换刀架。 另有六轴数控去毛刺工作站LRMC-870, 自动喷涂机LRPT-A1, 砂带机系列。 已服务全国20个分公司, 浙江省专精特新企业。"
+  },
+  "search": {
+    "max_results_per_query": 10,
+    "max_api_calls_per_company": 4,
+    "concurrency": 3,
+    "queries_per_round": 6,
+    "search_queries": [
+      "{country} {industry} hiring grinding robot automation 2024 2025",
+      "{country} {industry} new investment expansion funding",
+      "{country} {industry} looking for supplier RFQ tender",
+      "{country} {industry} automation upgrade modernization new line"
+    ]
+  },
+  "crawl": {
+    "timeout": 30,
+    "max_pages_per_site": 5,
+    "max_content_length": 12000,
+    "concurrency": 3
+  },
+  "mode_profiles": {
+    "free": {
+      "search_rounds": 8,
+      "max_per_round": 10,
+      "deep_crawl": true,
+      "max_pages": 3,
+      "llm_refine": true,
+      "llm_as_primary": false,
+      "concurrency": 2,
+      "description": "免费模式: DDG+Tavily搜索, Firecrawl深爬3页, 规则引擎+LLM精排, 意图信号增强"
+    },
+    "paid": {
+      "search_rounds": 15,
+      "max_per_round": 20,
+      "deep_crawl": true,
+      "max_pages": 6,
+      "llm_refine": true,
+      "llm_as_primary": true,
+      "concurrency": 4,
+      "description": "收费模式: DDG+Tavily Advanced+SerpAPI搜索, Firecrawl+Apify深爬6页, LLM主导+双轮验证+多源交叉"
+    }
+  },
+  "gmail": {
+    "email": "",
+    "app_password": "",
+    "sender_name": "Hangzhou Longli Intelligent Technology",
+    "daily_limit": 50,
+    "delay_seconds": 30
+  },
+  "firecrawl_self_hosted_url": ""
+}
