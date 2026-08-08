@@ -4,6 +4,9 @@
 
 平台不把某个行业的规则写死在代码中。每个行业可独立配置目标客户画像、搜索语句、评分维度、权重、等级阈值、否决条件、Prompt 和数据源。
 
+<img width="1569" height="1029" alt="1" src="https://github.com/user-attachments/assets/02aa965e-a81a-48c4-8c48-501c7c6020ab" />
+
+
 ## 主要能力
 
 - 多 Agent 工作流：ICP、市场、公司画像、联系人、意图、机会、邮件和反馈等角色协作。
@@ -28,30 +31,6 @@ python -m pip install -r requirements.txt
 
 复制 `.env.example` 为 `.env`，只填写实际启用的 Provider。真实 API Key 和 Gmail 应用密码不应写入 `settings.json` 或提交到版本库。
 
-### 3. 运行启动检查
-
-```powershell
-# 普通启动检查
-python config_validator.py
-
-# 完整商业发布门禁（包含发信）
-python config_validator.py --commercial --require-email
-```
-
-`fatal` 必须修复；`warning` 表示主链可能可运行，但某个功能不可用或存在发布风险。
-
-### 4. 启动
-
-```powershell
-# Flet 桌面界面
-python main.py
-
-# Web 界面
-python main.py --web
-
-# CLI 示例
-python start.py --country Germany --industry "industrial automation" --product "robotic finishing" --count 20 --mode free
-```
 
 ## 免费与付费模式
 
@@ -62,7 +41,11 @@ python start.py --country Germany --industry "industrial automation" --product "
 | 策略 | 较低并发、较小页面数 | 更多搜索轮次、深度爬取和交叉验证 |
 | 发布门禁 | 无付费 Key 仍可获客 | 必须有付费搜索/爬取源，或 paid MCP |
 
-“免费”指默认数据获取链不强制付费 API，不保证 LLM、网络、邮件或自定义 MCP 零成本。
+“免费”指默认数据获取链不强制付费 API，不保证 LLM、网络、邮件或自定义 MCP 零成本，免费模式用于跑通整套流程。
+<img width="1569" height="1027" alt="3" src="https://github.com/user-attachments/assets/48f2ed91-c194-47b3-ba88-efeb3568e5cb" />
+此为免费模式的某行业示例获取的潜在客户
+<img width="1566" height="1017" alt="7" src="https://github.com/user-attachments/assets/9f68c8bb-2ea9-42d9-be9a-b106870faff6" />
+
 
 ## 自定义行业
 
@@ -91,6 +74,8 @@ python start.py --country Germany --industry "industrial automation" --product "
 ## 邮件发送
 
 建议流程是“生成草稿 → 人工审核 → 小批量测试 → 限速发送 → 记录退信/退订/回复”。不要把未审核的全部 CSV 直接发送。上线前还要根据目标市场和自身业务场景确认发信依据、隐私告知、保留期和退订流程。
+<img width="1576" height="1017" alt="4" src="https://github.com/user-attachments/assets/a8609a77-61cd-4c47-8351-b7b38ec43927" />
+
 
 ## 跟进与回复闭环 (Phase 2)
 
@@ -108,33 +93,5 @@ python start.py --country Germany --industry "industrial automation" --product "
 - **商机看板**：GUI 新增"商机"页，按阶段查看/流转（已回复 → 谈判中 → 成交/流失），成交/流失结果回写公司标签供后续 RAG 引用。
 - **A/B 测试闭环**：发送时把模板变体名写入 `email_log.variant`，回复/退信自动回传，形成"变体 → 回复率"报表（GUI 邮件页与 `get_template_report_from_db()`）。
 - **关键词自适应**：搜索阶段自动合并 `keyword_performance` 中历史高转化关键词；每 10 轮以上评分数据可触发 `optimize_weights()` 校准评分权重（写入 `scoring.calibrated_weights`，无效时回退默认权重）。
-
-## 项目结构
-
-```text
-agents/                 多 Agent 角色
-core/                   核心模型、事件与状态
-workflow/               工作流编排与 checkpoint
-pipeline/               搜索、画像、评分管线
-providers/              Search/Crawl/LLM/Verify Provider
-tools/email/            邮件生成、发送、跟进与回复跟踪
-tools/exporter/         CSV 导出
-industries/             可版本化行业模板
-memory/                 公司记忆和持久化
-gui/                    Flet/PyQt 界面
-tests/                  离线回归与集成测试
-config_validator.py     启动/商业发布门禁
-health.py               本地健康检查
-```
-
-## 测试与交付
-
-```powershell
-python -m pytest tests/test_release_readiness.py -q
-python -m pytest -q
-python -m compileall -q .
-```
-
-详细部署见 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)，真实商业验收及签字清单见 [docs/COMMERCIAL_READINESS.md](docs/COMMERCIAL_READINESS.md)。
-
-> 商业状态原则：“代码已实现”、“离线测试通过”和“真实生产验收通过”是三个不同阶段，不得用前者替代后者。
+  
+欢迎大佬加入到这个项目的完善当中
