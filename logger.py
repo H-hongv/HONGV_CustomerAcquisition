@@ -1,4 +1,4 @@
-﻿"""
+"""
 外贸获客自动化系统 - 日志管理
 """
 import logging
@@ -15,7 +15,7 @@ LOG_FORMAT = "%(asctime)s [%(levelname)s] %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
-def setup_logger(name: str = "sdr_agent", level: str = "INFO") -> logging.Logger:
+def setup_logger(name: str = "sdr", level: str = "INFO") -> logging.Logger:
     """设置日志器"""
     logger = logging.getLogger(name)
     logger.setLevel(getattr(logging, level.upper()))

@@ -1,4 +1,4 @@
-﻿"""Development outreach email generator - re-exports from agents.email_agent (Sprint 3 unification).
+"""Development outreach email generator - re-exports from agents.email_agent (Sprint 3 unification).
 
 All email generation is now handled by agents/email_agent.py EmailStrategyAgent.
 This module kept for backward compatibility.

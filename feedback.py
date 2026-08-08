@@ -1,4 +1,4 @@
-﻿"""Feedback module - re-exports from agents.feedback_agent (Sprint 3 unification).
+"""Feedback module - re-exports from agents.feedback_agent (Sprint 3 unification).
 
 All feedback functionality is now unified in agents/feedback_agent.py.
 This module kept for backward compatibility.

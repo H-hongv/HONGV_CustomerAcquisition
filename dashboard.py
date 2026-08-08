@@ -1,4 +1,4 @@
-﻿"""Growth Metrics Dashboard — conversion funnel, cost analytics, lead pipeline.
+"""Growth Metrics Dashboard — conversion funnel, cost analytics, lead pipeline.
 
 Standalone console dashboard OR embeddable module for GUI.
 """

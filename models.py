@@ -1,4 +1,4 @@
-﻿"""
+"""
 获客自动化系统 - 通用数据模型
 """
 from dataclasses import dataclass, field

@@ -5,40 +5,51 @@ __pycache__/
 *.egg-info/
 dist/
 build/
-
-# Environment
-.env
-.env.*
+.venv/
+venv/
+.test-tmp/
 
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
+
+# Sensitive
+.env
+*.pem
+*.key
+credentials.json
+
+# Logs & Data
+logs/*.log
+debug.log
+.coverage
+.coverage.*
+exports/
+data/*.db
+*.db-shm
+*.db-wal
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Project specific
-logs/
-exports/
-*.log
-*.db
-*.sqlite
+# Spec
+spec/evaluation.json
+spec/gate_report.json
+spec/runtime_report.json
+spec/requirement.json
+spec/risk_report.json
+workflow/checkpoint/checkpoints.db
+
+# Auto-generated ADR files
+spec/adr/ADR-*.json
+spec/adr/ADR-*.md
 memory/*.db
+settings.json
 
-# Temp/debug
-_*.txt
-_*.py
-
-# MCP/CodeGraph
-.codegraph/
-.mcp/
-.pytest_cache/
-spec/v80_*
-spec/state.json
-spec/workflow.json
-spec/review_*
-spec/audit_*
-bench_results.json
+# Runtime data & backups (never commit)
+*.log
+*.bak
+logs/traces/
+/已处理公司清单.csv
+*.spec

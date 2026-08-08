@@ -1,4 +1,4 @@
-﻿import time
+import time
 
 class TraceSpan:
     def __init__(self, name: str):

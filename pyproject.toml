@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "foreign-trade-sdr-agent"
+version = "2.0.0"
+description = "AI SDR Agent for Foreign Trade Lead Generation and Email Outreach"
+requires-python = ">=3.10"
+dependencies = ["requests", "pydantic", "playwright", "google-generativeai", "aiohttp", "pandas", "openpyxl", "tavily-python", "flet", "mcp>=1.28,<2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.coverage.run]
+source = ["."]
+omit = ["tests/*", "__pycache__/*"]

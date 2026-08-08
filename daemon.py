@@ -1,199 +1,157 @@
-﻿"""SDR Daemon — 7x24 scheduler for automated lead generation.
+"""SDR Daemon - unified scheduler entry (Phase 3-P3).
 
-Usage:
-    python daemon.py              # Start daemon
-    python daemon.py --once       # Run one cycle and exit
-    python daemon.py --schedule   # Print schedule
+Legacy CLI entry point that now delegates all scheduling to
+AutoOutreachScheduler (settings.auto_outreach). Keeps the
+``--once``/``--schedule`` flags and maintains the ``.health``
+heartbeat file consumed by health.py.
 
-The daemon reads daemon_config.json for task schedules and
-runs the SDR pipeline on a cron-like interval.
+One-time migration of daemon_config.json -> settings.auto_outreach
+happens on construction (idempotent), eliminating the dual-scheduler
+conflict between the old daemon and the UI-driven auto scheduler.
 """
+import json
+import os
+import signal
 import sys
 import time
-import json
-import signal
-import os
 from pathlib import Path
-from datetime import datetime, timedelta
-from typing import List, Dict
+from datetime import datetime
 
 sys.path.insert(0, str(Path(__file__).parent))
 
 CONFIG_PATH = Path(__file__).parent / "daemon_config.json"
 HEALTH_PATH = Path(__file__).parent / ".health"
 
-DEFAULT_CONFIG = {
-    "tasks": [
-        {
-            "name": "daily_germany_automotive",
-            "country": "Germany",
-            "industry": "automotive",
-            "product": "die casting",
-            "count": 50,
-            "mode": "free",
-            "cron": "0 8 * * *",  # 8 AM daily
-            "enabled": True,
-        },
-        {
-            "name": "weekly_japan_electronics",
-            "country": "Japan",
-            "industry": "electronics",
-            "product": "pcb assembly",
-            "count": 30,
-            "mode": "free",
-            "cron": "0 9 * * 1",  # 9 AM Monday
-            "enabled": False,
-        },
-    ],
-    "settings": {
-        "max_daily_cost_usd": 5.0,
-        "pause_on_error": True,
-        "error_cooldown_minutes": 30,
-        "health_check_interval_seconds": 60,
-    },
-}
+
+def _map_cron_to_schedule(cron: str) -> dict:
+    """Map a legacy 5-field cron string to {frequency, run_at, day_of_week}."""
+    try:
+        minute, hour, _, _, dow = str(cron or "").split()
+        run_at = f"{int(hour):02d}:{int(minute):02d}"
+    except (ValueError, TypeError):
+        return {"frequency": "daily", "run_at": "09:00", "day_of_week": 1}
+    if str(dow).isdigit() and 0 <= int(dow) <= 6:
+        return {"frequency": "weekly", "run_at": run_at, "day_of_week": int(dow)}
+    return {"frequency": "daily", "run_at": run_at, "day_of_week": 1}
+
+
+def migrate_legacy_config(legacy_path=None) -> int:
+    """One-time migration of daemon_config.json into settings.auto_outreach.
+
+    Idempotent: skips when auto_outreach already has tasks. Returns the
+    number of tasks migrated (0 when nothing to do / already migrated).
+    """
+    legacy = Path(legacy_path) if legacy_path else CONFIG_PATH
+    if not legacy.exists():
+        return 0
+    try:
+        data = json.loads(legacy.read_text(encoding="utf-8"))
+        tasks = data.get("tasks") or []
+    except Exception:
+        return 0
+    if not tasks:
+        return 0
+    import config as config_module
+    cfg = config_module.config.get("auto_outreach", {}) or {}
+    if not isinstance(cfg, dict):
+        cfg = {}
+    if cfg.get("tasks"):
+        return 0
+    migrated = []
+    for t in tasks:
+        name = str(t.get("name", "") or "").strip()
+        if not name:
+            continue
+        sched = _map_cron_to_schedule(str(t.get("cron", "") or ""))
+        migrated.append({
+            "name": name,
+            "country": str(t.get("country", "") or ""),
+            "industry": str(t.get("industry", "") or ""),
+            "product": str(t.get("product", "") or ""),
+            "target_count": int(t.get("count", 20) or 20),
+            "mode": str(t.get("mode", "free") or "free"),
+            "frequency": sched["frequency"],
+            "run_at": sched["run_at"],
+            "day_of_week": sched["day_of_week"],
+            "send_emails": False,
+            "enabled": bool(t.get("enabled", True)),
+        })
+    if not migrated:
+        return 0
+    cfg["tasks"] = migrated
+    config_module.config.settings["auto_outreach"] = cfg
+    config_module.config.save()
+    backup = legacy.with_suffix(legacy.suffix + ".migrated.bak")
+    try:
+        if not backup.exists():
+            os.replace(str(legacy), str(backup))
+    except OSError:
+        pass
+    return len(migrated)
 
 
 class SdrDaemon:
-    """7x24 SDR Pipeline Daemon."""
+    """Legacy-compatible daemon wrapper around AutoOutreachScheduler."""
 
-    def __init__(self, config_path: str = None):
+    def __init__(self, config_path: str = None, migrate: bool = True):
         self.config_path = Path(config_path) if config_path else CONFIG_PATH
-        self.config = self._load_config()
+        self.HEALTH_PATH = HEALTH_PATH
         self._running = True
-        self._last_run: Dict[str, datetime] = {}
         self._error_count = 0
-        self._paused_until: datetime = None
-
+        # One-time migration only for the real default config path (CLI/GUI-free entry).
+        if migrate and config_path is None:
+            migrate_legacy_config()
         signal.signal(signal.SIGINT, self._handle_stop)
         signal.signal(signal.SIGTERM, self._handle_stop)
-
-    def _load_config(self) -> dict:
-        if self.config_path.exists():
-            with open(self.config_path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        # Create default
-        with open(self.config_path, "w", encoding="utf-8") as f:
-            json.dump(DEFAULT_CONFIG, f, indent=2, ensure_ascii=False)
-        return DEFAULT_CONFIG
 
     def _handle_stop(self, signum, frame):
         print("\nShutting down daemon...")
         self._running = False
 
     def _write_health(self, status: str, message: str = ""):
-        HEALTH_PATH.write_text(json.dumps({
+        self.HEALTH_PATH.write_text(json.dumps({
             "status": status,
             "timestamp": datetime.now().isoformat(),
             "message": message,
             "error_count": self._error_count,
         }), encoding="utf-8")
 
-    def _should_run(self, task: dict) -> bool:
-        if not task.get("enabled", True):
-            return False
+    @staticmethod
+    def _scheduler():
+        from tools.outreach.auto_scheduler import auto_outreach_scheduler
+        return auto_outreach_scheduler
 
-        if self._paused_until and datetime.now() < self._paused_until:
-            return False
-
-        # Check daily cost budget
-        from core.events.agent_context import default_context
-        daily_cost = default_context.get_daily_cost()
-        max_cost = self.config.get("settings", {}).get("max_daily_cost_usd", 5.0)
-        if daily_cost >= max_cost:
-            print(f"Daily cost limit reached (${daily_cost:.2f} >= ${max_cost})")
-            return False
-
-        # Simple cron-like: run if never run or enough time passed
-        name = task["name"]
-        if name not in self._last_run:
-            return True
-
-        hours_since = (datetime.now() - self._last_run[name]).total_seconds() / 3600
-        return hours_since >= 23  # Run at most once per 23 hours
-
-    def run_task(self, task: dict):
-        """Execute a single SDR task."""
-        from workflow import run_sdr_workflow
-        from logger import logger
-
-        name = task["name"]
-        print(f"\n[{datetime.now():%H:%M:%S}] Running: {name}")
-
-        try:
-            state = run_sdr_workflow(
-                country=task["country"],
-                industry=task.get("industry", ""),
-                product=task.get("product", ""),
-                target_count=task.get("count", 50),
-                mode=task.get("mode", "free"),
-            )
-
-            self._last_run[name] = datetime.now()
-            self._error_count = 0
-            self._write_health("healthy", f"Task {name}: {state.get_company_count()} leads")
-
-            print(f"  Complete: {state.get_company_count()} companies, "
-                  f"{state.get_contact_count()} contacts, "
-                  f"{state.elapsed_seconds}s")
-
-        except Exception as e:
-            self._error_count += 1
-            self._write_health("error", str(e)[:200])
-            logger.error(f"Daemon task {name} failed: {e}")
-            print(f"  FAILED: {e}")
-
-            if self.config.get("settings", {}).get("pause_on_error", True):
-                cooldown = self.config["settings"].get("error_cooldown_minutes", 30)
-                self._paused_until = datetime.now() + timedelta(minutes=cooldown)
-                print(f"  Paused for {cooldown} minutes")
-
-    def run_once(self):
-        """Run all enabled tasks once and exit."""
-        for task in self.config.get("tasks", []):
-            if self._should_run(task):
-                self.run_task(task)
+    def run_once(self) -> list:
+        """Run all enabled tasks once and exit (delegated to auto scheduler)."""
+        results = self._scheduler().run_all(dry_run=False)
+        ok = sum(1 for r in results if r.get("status") == "ok")
+        print(f"SDR run complete: {ok}/{len(results)} tasks ok")
+        return results
 
     def run_forever(self):
-        """Run daemon loop indefinitely."""
-        print("SDR Daemon started. Press Ctrl+C to stop.")
-        print(f"Tasks: {len(self.config.get('tasks', []))}")
-        print(f"Max daily cost: ${self.config.get('settings', {}).get('max_daily_cost_usd', 5.0)}")
-        print("-" * 50)
-
+        """Start the auto scheduler thread and maintain the .health heartbeat."""
+        print("SDR Daemon started (unified scheduler). Press Ctrl+C to stop.")
+        sched = self._scheduler()
+        sched.start()
         self._write_health("starting")
-
-        check_interval = self.config.get("settings", {}).get("health_check_interval_seconds", 60)
-
-        while self._running:
-            try:
-                ran_any = False
-                for task in self.config.get("tasks", []):
-                    if self._should_run(task):
-                        self.run_task(task)
-                        ran_any = True
-
-                if not ran_any:
-                    self._write_health("idle")
-
-                # Sleep in small intervals to stay responsive
-                for _ in range(check_interval):
+        try:
+            while self._running:
+                self._write_health(
+                    "healthy" if sched.running else "idle",
+                    f"auto_scheduler_running={sched.running}",
+                )
+                for _ in range(30):
                     if not self._running:
                         break
                     time.sleep(1)
-
-            except Exception as e:
-                print(f"Daemon loop error: {e}")
-                self._error_count += 1
-                time.sleep(60)
-
-        self._write_health("stopped")
-        print("Daemon stopped.")
+        finally:
+            self._write_health("stopped")
+            print("Daemon stopped.")
 
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="SDR Daemon")
+    parser = argparse.ArgumentParser(description="SDR Daemon (unified scheduler)")
     parser.add_argument("--once", action="store_true", help="Run once and exit")
     parser.add_argument("--schedule", action="store_true", help="Print schedule")
     args = parser.parse_args()
@@ -201,10 +159,12 @@ def main():
     daemon = SdrDaemon()
 
     if args.schedule:
-        print("Scheduled Tasks:")
-        for t in daemon.config.get("tasks", []):
-            status = "ENABLED" if t.get("enabled", True) else "DISABLED"
-            print(f"  [{status}] {t['name']}: {t['country']} {t.get('industry','')} (x{t.get('count',50)})")
+        print("Scheduled Tasks (settings.auto_outreach):")
+        for t in daemon._scheduler().tasks():
+            status = "ENABLED" if t.get("enabled", False) else "DISABLED"
+            freq = "daily" if t.get("frequency") == "daily" else "weekly"
+            print(f"  [{status}] {t['name']}: {t.get('country', '')} {t.get('industry', '')} "
+                  f"({freq} {t.get('run_at', '09:00')} x{t.get('target_count', 20)})")
         return
 
     if args.once:

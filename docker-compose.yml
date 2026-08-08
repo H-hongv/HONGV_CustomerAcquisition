@@ -1,4 +1,4 @@
-﻿version: "3.9"
+version: "3.9"
 
 services:
   sdr-agent:
@@ -13,25 +13,10 @@ services:
       - ./industries:/app/industries:ro
     environment:
       - TZ=Asia/Shanghai
-    # CLI mode example:
-    # command: ["--country", "Germany", "--industry", "automotive", "--engine", "graph"]
-    # Daemon mode:
-    command: ["--daemon"]
+    command: ["daemon.py"]
     healthcheck:
-      test: ["CMD", "python", "-c", "from workflow import checkpointer; checkpointer.get_analytics()"]
+      test: ["CMD", "python", "-c", "import health,sys; sys.exit(0 if health.quick_health_check() else 1)"]
       interval: 30s
       timeout: 10s
+      start_period: 10s
       retries: 3
-
-  # Optional: future PostgreSQL
-  # postgres:
-  #   image: postgres:15
-  #   environment:
-  #     POSTGRES_DB: sdr_agent
-  #     POSTGRES_USER: sdr
-  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
-
-# volumes:
-#   pgdata:
